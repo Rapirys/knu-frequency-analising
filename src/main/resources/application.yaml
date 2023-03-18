@@ -1,0 +1,15 @@
+audio:
+  format:
+    sampleRate: 48000
+    sampleSizeInBits: 16
+    channels: 2
+  buffer:
+    size: 2048
+
+view:
+  spectrogram:
+    width: 1024
+    high: 256
+
+
+
