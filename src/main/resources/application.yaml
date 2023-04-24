@@ -4,12 +4,31 @@ audio:
     sampleSizeInBits: 16
     channels: 2
   buffer:
-    size: 2048
-
+    sizeInSeconds: 16
+  window:
+    default: 'BLACKMAN'
+  representation:
+    spectrogram:
+      log2FFTLength:
+        max: 15
+        min: 9
+        value: 14
+      overlappingCoefficient:
+        max: 100
+        min: 2
+        value: 10
+      lowPassFilter:
+        max: 20000
+        min: 0
+        value: 7000
 view:
-  spectrogram:
-    width: 1024
-    high: 256
+  ui:
+    width: 1280
+    height: 720
+    renderWidth: 10000
+    renderHeight: 1080
+  fps: 60
+
 
 
 

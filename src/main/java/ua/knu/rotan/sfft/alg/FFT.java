@@ -1,15 +1,16 @@
 package ua.knu.rotan.sfft.alg;
 
-import static ua.knu.rotan.sfft.alg.WindowFunctions.hannWindow;
+import java.util.Arrays;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class FFT {
-
-  public static Complex[] fft(short[] x) {
-    Complex[] c = new Complex[x.length];
-    double[] window = hannWindow(c.length);
-
-    for (int i = 0; i < x.length; i++) c[i] = new Complex(window[i] * x[i], 0);
-    return fft(c);
+  public static Complex[] ifft(Complex[] x) {
+    int n = x.length;
+    return Arrays.stream(fft(Arrays.stream(x).map(Complex::conjugate).toArray(Complex[]::new)))
+        .map(Complex::conjugate)
+        .map(c -> c.scale(1.0 / n))
+        .toArray(Complex[]::new);
   }
 
   public static Complex[] fft(Complex[] x) {

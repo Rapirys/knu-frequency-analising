@@ -1,90 +1,60 @@
 package ua.knu.rotan.sfft.view;
 
-import java.awt.*;
-import lombok.experimental.UtilityClass;
+import static ua.knu.rotan.sfft.alg.audio.ColorUtil.linearColorInterpolation;
 
-@UtilityClass
-public final class ColorMapper {
-  public static Color getPurpleYellowGradient(double value) {
-    // Define the purple and yellow colors
-    Color purple = new Color(128, 0, 128); // dark purple
-    Color yellow = new Color(255, 255, 0); // yellow
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-    // Define the gamma correction factor
-    double gamma = 2.0;
+public class ColorMapper {
+  private final List<ColorNumberPair> colorNumberPairs = new ArrayList<>();
 
-    // Calculate the color based on the value
-    int red =
-        (int)
-            (Math.pow(1 - value, gamma) * purple.getRed()
-                + Math.pow(value, gamma) * yellow.getRed());
-    int green =
-        (int)
-            (Math.pow(1 - value, gamma) * purple.getGreen()
-                + Math.pow(value, gamma) * yellow.getGreen());
-    int blue =
-        (int)
-            (Math.pow(1 - value, gamma) * purple.getBlue()
-                + Math.pow(value, gamma) * yellow.getBlue());
-
-    // Create and return the color
-    return new Color(red, green, blue);
+  private ColorMapper(Color color, double number) {
+    colorNumberPairs.add(new ColorNumberPair(color, number));
   }
 
-  //    public static Color getBlackBodyGradient(double temperature) {
-  //        // Define the color temperature range
-  //        double[] colorTemperature = { 1000, 4000, 7000 };
-  //
-  //        // Calculate the color based on the temperature
-  //        if (temperature <= colorTemperature[0]) {
-  //            return Color.RED;
-  //        } else if (temperature <= colorTemperature[1]) {
-  //            double t = (temperature - colorTemperature[0]) / (colorTemperature[1] -
-  // colorTemperature[0]);
-  //            return interpolateColor(Color.RED, Color.WHITE, t);
-  //        } else if (temperature <= colorTemperature[2]) {
-  //            double t = (temperature - colorTemperature[1]) / (colorTemperature[2] -
-  // colorTemperature[1]);
-  //            return interpolateColor(Color.WHITE, Color.BLUE, t);
-  //        } else {
-  //            return Color.BLUE;
-  //        }
-  //    }
-  //
-  //    public static Color interpolateColor(Color c1, Color c2, double t) {
-  //        // Calculate the color based on the interpolation factor
-  //        int r = (int) (c1.getRed() * (1 - t) + c2.getRed() * t);
-  //        int g = (int) (c1.getGreen() * (1 - t) + c2.getGreen() * t);
-  //        int b = (int) (c1.getBlue() * (1 - t) + c2.getBlue() * t);
-  //
-  //        // Create and return the color
-  //        return new Color(r, g, b);
-  //    }
+  public static ColorMapper of(Color color, double number) {
+    return new ColorMapper(color, number);
+  }
 
-  public static Color getBlackBodyGradient(double temperature) {
-    // Define the constants used in the calculation
-    double c1 = 3.74183e-16; // W m^2
-    double c2 = 1.4388e-2; // m K
+  public ColorMapper add(Color color, double number) {
+    colorNumberPairs.add(new ColorNumberPair(color, number));
+    colorNumberPairs.sort(Comparator.comparingDouble(ColorNumberPair::number));
+    return this;
+  }
 
-    // Calculate the color based on the temperature
-    double lambda = 780e-9; // Red
-    double maxLambda = 380e-9; // Violet
-    double intensity = 0;
+  public Color mapNumberToColor(double number) {
+    int index = 0;
+    int size = colorNumberPairs.size();
 
-    for (double l = lambda; l >= maxLambda; l -= 1e-9) {
-      double power = c1 / Math.pow(l, 5) * (1 / (Math.exp(c2 / (l * temperature)) - 1));
-      intensity += power * 1e-9;
+    // Find the index of the first color-number pair whose number is greater than the given number
+    while (index < size && colorNumberPairs.get(index).number() <= number) {
+      index++;
     }
 
-    // Normalize the intensity to the range [0, 1]
-    intensity /= 2.9e14;
+    // If we have only one point to create gradient or
+    // the given number is greater than or equal to the number of the first color-number pair,
+    // return its color
+    if (colorNumberPairs.size() == 1 || index == 0) return colorNumberPairs.get(0).color;
+    // If the given number is greater than or equal to the number of the last color-number pair,
+    // return its color
+    if (index == size) {
+      return colorNumberPairs.get(size - 1).color();
+    }
 
-    // Calculate the color based on the normalized intensity
-    int r = (int) (255 * Math.pow(intensity, 0.8));
-    int g = (int) (255 * Math.pow(intensity, 0.6));
-    int b = (int) (255 * Math.pow(intensity, 0.4));
+    // Calculate the position of the given number within the range of the color-number pair
+    double prevNumber = colorNumberPairs.get(index - 1).number();
+    double nextNumber = colorNumberPairs.get(index).number();
+    double position = (number - prevNumber) / (nextNumber - prevNumber);
 
-    // Create and return the color
-    return new Color(r, g, b);
+    // Interpolate between the colors of the two neighboring color-number pairs based on the
+    // position
+    Color prevColor = colorNumberPairs.get(index - 1).color();
+    Color nextColor = colorNumberPairs.get(index).color();
+
+    return linearColorInterpolation(prevColor, nextColor, position);
   }
+
+  private record ColorNumberPair(Color color, double number) {}
 }

@@ -2,14 +2,7 @@ package ua.knu.rotan.sfft.alg;
 
 import static java.lang.Math.sqrt;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
-public class Complex {
-  private double real, imag;
-
+public record Complex(double real, double imag) {
   public Complex add(Complex other) {
     double real = this.real + other.real;
     double imag = this.imag + other.imag;
@@ -46,5 +39,17 @@ public class Complex {
     } else {
       return String.format("%.2f + %.2fi", real, imag);
     }
+  }
+
+  public static Complex fromReal(double real) {
+    return new Complex(real, 0);
+  }
+
+  public Complex conjugate() {
+    return new Complex(real, -imag);
+  }
+
+  public Complex scale(double n) {
+    return new Complex(real * n, -imag * n);
   }
 }
