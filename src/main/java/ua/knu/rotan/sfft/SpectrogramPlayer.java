@@ -1,7 +1,7 @@
 package ua.knu.rotan.sfft;
 
 import static java.lang.Math.*;
-import static ua.knu.rotan.sfft.alg.audio.AudioUtil.lowPassFilterWithRMS;
+import static ua.knu.rotan.sfft.audio.AudioUtil.lowPassFilterWithRMS;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import ua.knu.rotan.sfft.alg.Complex;
 import ua.knu.rotan.sfft.alg.FFT;
 import ua.knu.rotan.sfft.alg.WindowFunction;
-import ua.knu.rotan.sfft.alg.audio.AudioSupplier;
+import ua.knu.rotan.sfft.audio.AudioSupplier;
 import ua.knu.rotan.sfft.config.FrequencyRepresentationProperties;
 import ua.knu.rotan.sfft.view.*;
 
@@ -89,6 +89,7 @@ public class SpectrogramPlayer implements ApplicationRunner {
                     .map(x -> 10 * log10(x / Short.MAX_VALUE)))
         .map(x -> x.mapToObj(colorMapper::mapNumberToColor).toArray(Color[]::new))
         .forEachOrdered(spectrogram::update);
+
     spectrogram.repaint();
   }
 }

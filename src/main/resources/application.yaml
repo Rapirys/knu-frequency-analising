@@ -25,8 +25,8 @@ view:
   ui:
     width: 1280
     height: 720
-    renderWidth: 10000
-    renderHeight: 1080
+    renderWidth: 1920
+    renderHeight: 1280
   fps: 60
 
 

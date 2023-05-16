@@ -1,4 +1,4 @@
-package ua.knu.rotan.sfft.alg.audio;
+package ua.knu.rotan.sfft.audio;
 
 import java.awt.*;
 import lombok.experimental.UtilityClass;

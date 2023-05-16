@@ -1,5 +1,6 @@
 package ua.knu.rotan.sfft;
 
+import java.awt.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 

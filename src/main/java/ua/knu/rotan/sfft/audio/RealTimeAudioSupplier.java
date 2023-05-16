@@ -1,18 +1,16 @@
-package ua.knu.rotan.sfft.alg.audio;
+package ua.knu.rotan.sfft.audio;
 
 import static java.lang.Math.min;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.TargetDataLine;
+import javax.sound.sampled.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.knu.rotan.sfft.alg.CycleBuffer;
+
 // import ua.knu.rotan.sfft.view.MainFrame;
 
 @Service
@@ -29,8 +27,7 @@ public class RealTimeAudioSupplier implements AudioSupplier {
   @PostConstruct
   @SneakyThrows
   public void init() {
-    DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
-    line = (TargetDataLine) AudioSystem.getLine(info);
+    line = AudioSystem.getTargetDataLine(audioFormat);
     line.open(audioFormat);
 
     channels = new CycleBuffer[audioFormat.getChannels()];

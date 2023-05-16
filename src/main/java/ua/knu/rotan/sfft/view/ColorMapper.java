@@ -1,6 +1,6 @@
 package ua.knu.rotan.sfft.view;
 
-import static ua.knu.rotan.sfft.alg.audio.ColorUtil.linearColorInterpolation;
+import static ua.knu.rotan.sfft.audio.ColorUtil.linearColorInterpolation;
 
 import java.awt.Color;
 import java.util.ArrayList;

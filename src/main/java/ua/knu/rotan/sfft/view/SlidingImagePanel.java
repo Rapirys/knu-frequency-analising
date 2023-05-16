@@ -17,6 +17,7 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
 
   @Override
   public synchronized void paint(Graphics g) {
+
     g.drawImage(
         image,
         0,
