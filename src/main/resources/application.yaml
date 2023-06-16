@@ -15,7 +15,7 @@ audio:
         value: 14
       overlappingCoefficient:
         max: 100
-        min: 2
+        min: 5
         value: 10
       lowPassFilter:
         max: 20000
@@ -26,8 +26,8 @@ view:
     width: 1280
     height: 720
     renderWidth: 1920
-    renderHeight: 1280
-  fps: 60
+    renderHeight: 32768
+  fps: 90
 
 
 

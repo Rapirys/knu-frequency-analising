@@ -2,6 +2,10 @@ package ua.knu.rotan.sfft.view;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+
+import static java.lang.Math.min;
+import static java.util.Collections.max;
 
 public class SlidingImagePanel extends VerticalPanelNavigator {
   private final BufferedImage image;
@@ -13,11 +17,11 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
     setPreferredSize(new Dimension(maxWidth, maxHeight));
     setVisible(true);
     image = new BufferedImage(maxWidth * 2, maxHeight, BufferedImage.TYPE_INT_RGB);
+    image.setAccelerationPriority(1);
   }
 
   @Override
   public synchronized void paint(Graphics g) {
-
     g.drawImage(
         image,
         0,
@@ -31,6 +35,47 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
         this);
   }
 
+  public synchronized void update(Color[][] raw) {
+    if (raw.length>image.getWidth() / 2)
+      raw = Arrays.copyOfRange(raw, raw.length - image.getWidth() / 2, raw.length);
+    if (raw.length>image.getWidth()/2-shift) {
+      int splitIndex = image.getWidth() / 2 - shift; //Math.max(0, Math.min(image.getWidth() / 2 - shift, raw.length));
+      Color[][] firstPart = Arrays.copyOfRange(raw, 0, splitIndex);
+      Color[][] secondPart = Arrays.copyOfRange(raw, splitIndex, raw.length);
+      updateImage(firstPart);
+      updateImage(secondPart);
+    } else updateImage(raw);
+  }
+
+  private synchronized void updateImage(Color[][] raw) {
+    if (raw.length==0) return;
+    BufferedImage newImage = generateImage(raw);
+
+    Graphics g = image.createGraphics();
+    g.drawImage(newImage, shift,0, shift+raw.length, image.getHeight(), 0, 0,newImage.getWidth(), newImage.getHeight(), this);
+    g.drawImage(newImage,  shift + image.getWidth() / 2,0, shift + image.getWidth() / 2+raw.length, image.getHeight(),0, 0,newImage.getWidth(), newImage.getHeight(), this);
+    shift = (shift + raw.length) % (image.getWidth() / 2);
+
+    g.dispose();
+  }
+
+  private BufferedImage generateImage(Color[][] raw) {
+    int width = raw.length;
+    int height = raw[0].length;
+    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        image.setRGB(x, y, raw[x][y].getRGB());
+      }
+    }
+
+    return image;
+  }
+
+
+
+  @Deprecated
   public synchronized void update(Color[] raw) {
     Color[] resizedRow = boxScaling1D(raw, image.getHeight());
     for (int y = 0; y < resizedRow.length; y++) {
@@ -40,6 +85,7 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
     shift = (shift + 1) % (image.getWidth() / 2);
   }
 
+  @Deprecated
   public static Color[] boxScaling1D(Color[] input, int outputSize) {
     Color[] output = new Color[outputSize];
 

@@ -22,7 +22,7 @@ public class AppConfig {
 
   @Bean
   public ColorMapper getColorMapper() {
-    double min = -70, max = -30;
+    double min = -70, max = -20;
     return ColorMapper.of(new Color(0, 0, 0), min + (max - min) * 0 / 8)
         .add(new Color(0, 0, 79), min + (max - min) * 1 / 8)
         .add(new Color(79, 0, 123), min + (max - min) * 2 / 8)

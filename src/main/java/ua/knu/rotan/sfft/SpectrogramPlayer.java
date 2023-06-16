@@ -8,8 +8,12 @@ import java.awt.event.*;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.sound.sampled.AudioFormat;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -61,6 +65,7 @@ public class SpectrogramPlayer implements ApplicationRunner {
   }
 
   public void task(final int channelIndex) {
+    long taskStartTime = System.nanoTime();
     final int numberOfSamples = 1 << fap.getLog2FFTLength().getValue();
     final int shiftSize =
         (int) (numberOfSamples * fap.getOverlappingCoefficient().getValue() / 100.0);
@@ -71,6 +76,8 @@ public class SpectrogramPlayer implements ApplicationRunner {
     SlidingImagePanel spectrogram = mainWindow.getSpectrogram(0);
 
     int[][] audioData = getAudioData(numberOfSamples, channelIndex, shiftSize);
+    Color[][] newSpectrogram = new Color[audioData.length][];
+    AtomicInteger i = new AtomicInteger();
 
     Arrays.stream(audioData)
         .parallel()
@@ -88,8 +95,11 @@ public class SpectrogramPlayer implements ApplicationRunner {
                     .map(x -> 2 * x / windowsSum)
                     .map(x -> 10 * log10(x / Short.MAX_VALUE)))
         .map(x -> x.mapToObj(colorMapper::mapNumberToColor).toArray(Color[]::new))
-        .forEachOrdered(spectrogram::update);
+        .forEachOrdered(x->newSpectrogram[i.getAndIncrement()] = x);
+    spectrogram.update(newSpectrogram);
 
     spectrogram.repaint();
+    long end = System.nanoTime();
+    //System.out.println("FPS: "+ (10e9/(end-taskStartTime)) + " Total time: "+(end-taskStartTime)+" size: "+audioData.length);
   }
 }
