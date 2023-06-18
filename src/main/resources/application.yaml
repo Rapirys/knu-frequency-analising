@@ -9,6 +9,9 @@ audio:
     default: 'BLACKMAN'
   representation:
     spectrogram:
+      color:
+        black_dBFS: -70
+        white_dBFS: -23
       log2FFTLength:
         max: 15
         min: 9

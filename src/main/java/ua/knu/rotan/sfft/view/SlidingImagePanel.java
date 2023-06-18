@@ -4,9 +4,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
-import static java.lang.Math.min;
-import static java.util.Collections.max;
-
 public class SlidingImagePanel extends VerticalPanelNavigator {
   private final BufferedImage image;
   private int shift;
@@ -36,10 +33,12 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
   }
 
   public synchronized void update(Color[][] raw) {
-    if (raw.length>image.getWidth() / 2)
+    if (raw.length > image.getWidth() / 2)
       raw = Arrays.copyOfRange(raw, raw.length - image.getWidth() / 2, raw.length);
-    if (raw.length>image.getWidth()/2-shift) {
-      int splitIndex = image.getWidth() / 2 - shift; //Math.max(0, Math.min(image.getWidth() / 2 - shift, raw.length));
+    if (raw.length > image.getWidth() / 2 - shift) {
+      int splitIndex =
+          image.getWidth() / 2
+              - shift; // Math.max(0, Math.min(image.getWidth() / 2 - shift, raw.length));
       Color[][] firstPart = Arrays.copyOfRange(raw, 0, splitIndex);
       Color[][] secondPart = Arrays.copyOfRange(raw, splitIndex, raw.length);
       updateImage(firstPart);
@@ -48,12 +47,32 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
   }
 
   private synchronized void updateImage(Color[][] raw) {
-    if (raw.length==0) return;
+    if (raw.length == 0) return;
     BufferedImage newImage = generateImage(raw);
 
     Graphics g = image.createGraphics();
-    g.drawImage(newImage, shift,0, shift+raw.length, image.getHeight(), 0, 0,newImage.getWidth(), newImage.getHeight(), this);
-    g.drawImage(newImage,  shift + image.getWidth() / 2,0, shift + image.getWidth() / 2+raw.length, image.getHeight(),0, 0,newImage.getWidth(), newImage.getHeight(), this);
+    g.drawImage(
+        newImage,
+        shift,
+        0,
+        shift + raw.length,
+        image.getHeight(),
+        0,
+        0,
+        newImage.getWidth(),
+        newImage.getHeight(),
+        this);
+    g.drawImage(
+        newImage,
+        shift + image.getWidth() / 2,
+        0,
+        shift + image.getWidth() / 2 + raw.length,
+        image.getHeight(),
+        0,
+        0,
+        newImage.getWidth(),
+        newImage.getHeight(),
+        this);
     shift = (shift + raw.length) % (image.getWidth() / 2);
 
     g.dispose();
@@ -72,8 +91,6 @@ public class SlidingImagePanel extends VerticalPanelNavigator {
 
     return image;
   }
-
-
 
   @Deprecated
   public synchronized void update(Color[] raw) {

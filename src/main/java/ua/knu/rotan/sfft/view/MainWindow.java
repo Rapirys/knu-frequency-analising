@@ -33,6 +33,7 @@ public class MainWindow extends JFrame {
     controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
     add(controlPanel, BorderLayout.EAST);
     addKayPressedAction(KeyEvent.VK_TAB, () -> controlPanel.setVisible(!controlPanel.isVisible()));
+    addKayPressedAction(KeyEvent.VK_F12, this::undecoratedMode);
 
     setPreferredSize(new Dimension(uiConfig.width, uiConfig.height));
     pack();
@@ -81,5 +82,11 @@ public class MainWindow extends JFrame {
 
   public void addSpectrogram(int channels) {
     for (int i = 0; i < channels; i++) addSpectrogram();
+  }
+
+  private void undecoratedMode() {
+    dispose();
+    setUndecorated(!isUndecorated());
+    setVisible(true);
   }
 }
